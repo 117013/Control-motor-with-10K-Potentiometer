@@ -1,0 +1,52 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+int encoder= 2;
+int enable = 3;
+int in1 = 4;
+int in2 = 5;
+int timecho = 1000;
+unsigned long thoigian;
+unsigned long hientai = 0;
+int dem = 0;
+int rpm;
+int bientro;
+int bamxung;
+void docgiatri()
+{
+dem++;
+}
+void setup() {
+// put your setup code here, to run once:
+Serial.begin(9600);
+lcd.init();
+lcd.backlight();
+lcd.setCursor(0, 0);
+lcd.print("RPM: ");
+pinMode(in1, OUTPUT);
+pinMode(in2, OUTPUT);
+pinMode(enable, OUTPUT);
+pinMode(encoder, INPUT);
+attachInterrupt(0, docgiatri, RISING);
+
+}
+
+void loop() {
+// put your main code here, to run repeatedly:
+
+bientro = analogRead(A0);
+bamxung = map(bientro, 0, 1023, 0, 255);
+digitalWrite(in1, HIGH);
+digitalWrite(in2, LOW);
+analogWrite(enable, bamxung);
+thoigian = millis();
+if(thoigian - hientai >= timecho)
+{
+hientai = thoigian;
+rpm = (dem / 20) * 60;
+dem = 0;
+lcd.setCursor(0, 1); // cot 0 hang 1
+lcd.print(rpm);
+}
+
+}
